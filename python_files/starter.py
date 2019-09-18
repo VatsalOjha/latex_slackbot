@@ -48,18 +48,9 @@ header = {
 	'Authorization': 'Bearer '+slack_token
 }
 def send_image(data, image_path):
-    payload = {
-        "token": slack_token,
-        "channels": [data["event"]["channel"]]
-    }
-    pic = open(image_path, 'rb')
-    my_file = {
-        'file': ('anime.jpg', pic, 'png')
-    }
     channel = data["event"]["channel"]
     send_image_cmd = f'curl -F file=@{image_path} -F channels={channel} -H "Authorization: Bearer {slack_token}" https://slack.com/api/files.upload' 
     subprocess.run(shlex.split(send_image_cmd), check=True)
-    pic.close()
     return
 
 def write_file(path, text):
@@ -92,9 +83,9 @@ def handle_event(data):
     current_process.add(json.dumps(data))
     try:
         text = data["event"]["text"]
-        if data["event"]["text"].startswith("$") and data["event"]["text"].endswith("$"):
+        if text.startswith("$") and text.endswith("$"):
             send_latex(data, text)
-        elif data["event"]["text"].startswith("[;") and data["event"]["text"].endswith(";]"):
+        elif text.startswith("[;") and text.endswith(";]"):
             text = text.strip("[]; ")
             send_latex(data, text)
     except:
